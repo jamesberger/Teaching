@@ -1,0 +1,1 @@
+cat war-and-peace.txt | tr [:space:] '\n' | grep -v "^\s*$" | sort | uniq -c | sort -bnr | head -10
