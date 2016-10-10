@@ -1,0 +1,1 @@
+This class was skipped due to the late start of the class as a whole this semester. Normally I cover command line permissions and a few other minor things that were touched on in the first and third classes this semester.
