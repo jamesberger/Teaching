@@ -1,4 +1,6 @@
 #!/bin/bash
+
+# Let's make sure we exit if there's any sort of error or an error in a command
 set -e
 set -o pipefail
 
