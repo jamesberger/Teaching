@@ -1,5 +1,21 @@
 #!/bin/bash
 
+
+# Add and validate the following fields:
+# 1. First name (already done-ish, needs to be converted to a while loop)
+# 2. Last name (already done-ish, needs to be converted to a while loop)
+# 3. Address number
+# 4. Address street name
+# 5. Address city name
+# 6. Address state name
+# 7. Address zip code (five digits only) (already done-ish, needs to be converted to a while loop)
+# 8. Prospective student email address (validate this as best you can)
+# 9. Generate a student information file every time the script runs successfully,
+# append the output on every run.
+# 10. If you have time, see if you can re-write the script to allow the user to
+# edit the data when it’s given to them for review if anything is mis-typed.
+
+
 # Let's make sure we exit if there's any sort of error or an error in a command
 set -e
 set -o pipefail
