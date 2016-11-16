@@ -99,6 +99,13 @@ Build tool requirements:
        blank or null)
 5d. A field for a 'last modified on' date
     - (compare initial date to current date, if different, set modified date)
+5e. A field for the template version.
+    - (pre-populated value if no modified date: 0)
+    - (pre-populated value if modified date set: check for existing templates
+      with this name and increment the most recent template value by one)
+      - For example, if fuel-city-tacos_v2.template exists in the same directory
+        as the script and the user goes to save the template, it should create
+        it as "fuel-city-tacos_v3.template" and set the template version to "3"
 5e. The AWS region the instances will be built in
     - (list of regions should be hardcoded in, new regions only happen once or
       twice a year)
@@ -119,6 +126,10 @@ Build tool requirements:
     - (this is a true / false value)
 5k. How large the root EBS storage volume should be
     - (user should be able to specify any size between 100 GB and 16,000 GB)
+5l. What instance type is being used for all members of the cluster.
+    - (to simplify, we will say that all instances in the cluster do the same
+      thing more or less and accordingly, all instances will be the same type)
+    - This will pull the list of possible values from an external file
 
 6. This should all be done in an interactive script that presents a very, very
    simple looking "UI" for the user.
@@ -134,6 +145,7 @@ Customer_name,Taco_Tuesday
 Build_ticket,2045
 Template_created_date,Wed Nov 16 19:10:39 UTC 2016
 Template_last_modified_date,
+Template_version,0
 AWS_region,us-east-1
 Build_AMI,ami-4e8af226
 SSH_keypair,prod
@@ -141,6 +153,7 @@ Software_version,prod-blue-v0-75
 Software_package_set,prod-blue, apollo-prod-blue,bash,bind9-host,ntp,openssh-server,python,util-linux,vim
 Termination_protection,true
 EBS_volume_size,100
+Instance_type,r3.8xl, 32 vCPU, 244 GB of RAM
 
 
 AWS regions:
