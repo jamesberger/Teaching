@@ -84,23 +84,24 @@ Build tool requirements:
    kind of build it is.
    - Possible build types are listed in the file "software-packages-by-build-type"
 
-
 4a. This list of software packages should also be in an external file to allow
      easy updating by non-programmers and not hard-coded into the script.
 
 5. The template must store the following information.
 5a. Customer name
-    - (blank)
+    - (pre-populated value: blank)
     - (must be converted to lowercase and have any spaces replaced with dashes)
 5b. Build ticket number
-    - (build ticket field should be blank)
+    - (pre-populated value: blank)
+    - (should have a regex to only allow numeric values)
 5c. Initial date template was created on
     - (get current date and set it in a variable if the $INITAL_DATE field is
        blank or null)
 5d. A field for a 'last modified on' date
     - (compare initial date to current date, if different, set modified date)
 5e. The AWS region the instances will be built in
-    - (hardcoded in, new regions only happen once or twice a year)
+    - (list of regions should be hardcoded in, new regions only happen once or
+      twice a year)
 5f. The AMI (Amazon Machine Image) needed for the build.
     - (pre-populated with the standard AMI but allow the user to choose from a
       list in an external file)
@@ -109,11 +110,14 @@ Build tool requirements:
        from a list in an external file - for example, the clusters built for
        dev work should use a different key than the production clusters)
 5h. The software version
-    - (pre-populated with the default, optional choices pulled from a short list
-     stored in an external file)
-5i. Whether or not termination protection will be enabled on the instances
+    - (pre-populated with the default prod blue version, optional choices pulled
+      from a short list stored in an external file)
+5i. The software packages required for the software version
+    - This should be linked to the software version and not allow a user to set
+      the wrong software packages for the software version in question.
+5j. Whether or not termination protection will be enabled on the instances
     - (this is a true / false value)
-5j. How large the root EBS storage volume should be
+5k. How large the root EBS storage volume should be
     - (user should be able to specify any size between 100 GB and 16,000 GB)
 
 6. This should all be done in an interactive script that presents a very, very
@@ -124,7 +128,23 @@ Build tool requirements:
     fashion.
 
 
+Example template:
+-----------------
+Customer_name,Taco_Tuesday
+Build_ticket,2045
+Template_created_date,Wed Nov 16 19:10:39 UTC 2016
+Template_last_modified_date,
+AWS_region,us-east-1
+Build_AMI,ami-4e8af226
+SSH_keypair,prod
+Software_version,prod-blue-v0-75
+Software_package_set,prod-blue, apollo-prod-blue,bash,bind9-host,ntp,openssh-server,python,util-linux,vim
+Termination_protection,true
+EBS_volume_size,100
+
+
 AWS regions:
+------------
 ap-south-1
 eu-west-1
 ap-northeast-2
@@ -139,6 +159,7 @@ us-west-1
 us-west-2
 
 Software packages by build type:
+--------------------------------
 dev-test,apollo-test,adduser,bash,bind9-host,ntp,openssh-server,python,tcpdump,util-linux,vim
 dev-test-HIPAA,apollo-test-HIPAA,adduser,bash,bind9-host,ntp,openssh-server,python,tcpdump,util-linux,vim
 dev-test-PCI, apollo-test-PCI,adduser,bash,bind9-host,ntp,openssh-server,python,tcpdump,util-linux,vim
@@ -156,6 +177,7 @@ prod-green-PCI, apollo-prod-green-PCI,bash,iptables,ntp,openssh-server,python,ut
 
 
 Software versions:
+------------------
 dev-test-v0-75
 dev-test-HIPAA-v0-75
 dev-test-PCI-v0-75
@@ -186,7 +208,8 @@ prod-blue-PCI-v1-05
 prod-green-PCI-v1-05
 
 
-Instances:
+Whitelisted instance types:
+---------------------------
 m4.2xl, 8 vCPU, 32 GB of RAM
 m4.4xl, 16 vCPU, 64 GB of RAM
 m4.10xl, 40 vCPU, 160 GB of RAM
@@ -204,6 +227,7 @@ d2.4xl, 16 vCPU, 122 GB of RAM
 d2.8xl, 36 vCPU, 244 GB of RAM
 
 SSH keys:
+---------
 dev-test
 dev-staging
 prod
@@ -211,6 +235,7 @@ prod-HIPAA
 prod-PCI
 
 AMIs:
+-----
 ami-ef748382 - dev-test-blue
 ami-a4f48acc - dev-test-green
 ami-d06ef2c7 - dev-staging-blue
