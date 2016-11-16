@@ -1,0 +1,231 @@
+"You've just accepted an offer to work for a promising new startup!
+
+They sell a SaaS (software as a service) product code named "Apollo" that is
+wildly popular. Their infrastructure runs on AWS, but they've had problems
+recently that are causing them to lose customers.
+
+It turns out that all of the instances they build to support their software
+product are provisioned by hand! Understandably, human beings aren't perfect and
+tend to make mistakes.
+
+Unfortunately, they're mistakes like building a set of eight t2.micro instances
+with 1 GB of RAM and 1 CPU each to support a software product that requires a
+cluster of eight c4.8xl instances with 60 gigs of RAM and 32 CPUs each.
+
+When this amazing software tries to run on a cluster of eight tiny t2.micro
+instances, the customer has a horrible experience with laggy software that
+times out just clicking through pages. It's miserable.
+
+Or they're mistakes like only provisioning the correct software packages on half
+of the instances in the cluster, or typing the IP of the cluster masters
+incorrectly in the cluster master config file for six out of the usual eight
+instances, causing the cluster to lose all of the customer's data when the two
+instances with the correct IP for the cluster master die unexpectedly.
+
+The customer's lawyers send very unpleasant letters to the startup threatening,
+among many other unpleasant things, to sue for millions if they can't make it
+right. A lawsuit like that could put your brand new employer out of business.
+
+Worst of all, you'd be looking for a new job.
+
+These things are horrible and should never happen! If only they had some sort of
+build tool that would allow them to create standardized templates that specify
+all of these options the same way, all day, every day.
+
+Your mission, should you choose to accept it, is to build that tool."
+
+
+Build tool requirements:
+1. Must create a standardized build template file.
+  - In our theoretical scenario, this template will then be fed into Jenkins,
+    Chef or similar orchestration software that will connect to the AWS API and
+    build the required instances with the required software packages and
+    configuration options, so the focus will just be on building the template.
+
+1a. Must put each feature in its own function, as much as reasonably possible.
+    - There is a reasonable balance between having a thousand functions and
+      having no functions, work to strike that balance as much as possible.
+
+1b. All features must have two comments;
+    - A comment that lists the feature's ID number.
+    - A comment that shows the logical flow of how the feature works
+    - Example:
+      # Feature 5d
+      # This feature sets a "last modified date" if the two following conditions
+      # are met:
+      # 1. The variable $INITIAL_DATE is not blank or null.
+      # 2. The current date ($date) does not match the contents of $INITIAL_DATE
+      # If both conditions 1 and 2 are true, this feature sets the variable
+      # $LAST_MODIFIED_DATE to the same value as the current date.
+    - This allows you to easily debug your feature by comparing what it's doing
+      now compared to what the comment says it should be doing.
+
+2. Must allow users to save templates and load existing templates.
+
+2a. If a template differs from the previous saved version, when the user saves
+    the updated version, it should be in a different file with the same name,
+    but a different version number.
+    - For example, fuel-city-tacos.template and fuel-city-tacos_v2.template
+    - This will allow versioning (important if you ever want to roll back to a
+      known good version!) and prevent users from accidentally overwriting the
+      template with the wrong values and having nothing to restore from.
+    - These features can be put in the same function with features 5d and 5c.
+
+3. Must pull from a list of existing AWS instance types and allow the user to
+   specify the desired one.
+
+3a. This list should be in an external file to allow safe and easy updating by
+    non-programmers and not hard-coded into the script.
+   - These AWS instances will be a whitelisted subset of all AWS instances -
+     notably, only the ones that the software can run on without making them
+     glow orange.
+
+4. Must allow the user to select different sets of software, depending on what
+   kind of build it is.
+   - Possible build types are listed in the file "software-packages-by-build-type"
+
+
+4a. This list of software packages should also be in an external file to allow
+     easy updating by non-programmers and not hard-coded into the script.
+
+5. The template must store the following information.
+5a. Customer name
+    - (blank)
+    - (must be converted to lowercase and have any spaces replaced with dashes)
+5b. Build ticket number
+    - (build ticket field should be blank)
+5c. Initial date template was created on
+    - (get current date and set it in a variable if the $INITAL_DATE field is
+       blank or null)
+5d. A field for a 'last modified on' date
+    - (compare initial date to current date, if different, set modified date)
+5e. The AWS region the instances will be built in
+    - (hardcoded in, new regions only happen once or twice a year)
+5f. The AMI (Amazon Machine Image) needed for the build.
+    - (pre-populated with the standard AMI but allow the user to choose from a
+      list in an external file)
+5g. The SSH key pair to use when building the instances.
+     - (pre-populated with the standard SSH key but allow the user to choose
+       from a list in an external file - for example, the clusters built for
+       dev work should use a different key than the production clusters)
+5h. The software version
+    - (pre-populated with the default, optional choices pulled from a short list
+     stored in an external file)
+5i. Whether or not termination protection will be enabled on the instances
+    - (this is a true / false value)
+5j. How large the root EBS storage volume should be
+    - (user should be able to specify any size between 100 GB and 16,000 GB)
+
+6. This should all be done in an interactive script that presents a very, very
+   simple looking "UI" for the user.
+   - Don't spend a ton of time on this until all the other features are
+     complete, as designing a UI can be an endless rabbit hole.
+  - Focus on just having all the fields printed out to the screen in an orderly
+    fashion.
+
+
+AWS regions:
+ap-south-1
+eu-west-1
+ap-northeast-2
+ap-northeast-1
+sa-east-1
+ap-southeast-1
+ap-southeast-2
+eu-central-1
+us-east-1
+us-east-2
+us-west-1
+us-west-2
+
+Software packages by build type:
+dev-test,apollo-test,adduser,bash,bind9-host,ntp,openssh-server,python,tcpdump,util-linux,vim
+dev-test-HIPAA,apollo-test-HIPAA,adduser,bash,bind9-host,ntp,openssh-server,python,tcpdump,util-linux,vim
+dev-test-PCI, apollo-test-PCI,adduser,bash,bind9-host,ntp,openssh-server,python,tcpdump,util-linux,vim
+dev-staging, apollo-staging,adduser,bash,bind9-host,ntp,openssh-server,python,tcpdump,util-linux,vim
+dev-staging-blue-HIPAA,apollo-staging-blue-HIPAA,adduser,bash,iptables,ntp,openssh-server,python,tcpdump,util-linux,vim
+dev-staging-green-HIPAA,apollo-green-HIPAA,adduser,iptables,ntp,openssh-server,python,tcpdump,util-linux,vim
+dev-staging-blue-PCI, apollo-blue-PCI,adduser,bash,bind9-host,ntp,openssh-server,python,tcpdump,util-linux,vim
+dev-staging-green-PCI, apollo-green-PCI,adduser,bash,bind9-host,ntp,openssh-server,python,tcpdump,util-linux,vim
+prod-blue, apollo-prod-blue,bash,bind9-host,ntp,openssh-server,python,util-linux,vim
+prod-green, apollo-prod-green,bash,bind9-host,ntp,openssh-server,python,util-linux,vim
+prod-blue-HIPAA, apollo-prod-blue-HIPAA,bash,iptables,ntp,openssh-server,python,util-linux,vim
+prod-green-HIPAA, apollo-prod-green-HIPAA,bash,iptables,ntp,openssh-server,python,util-linux,vim
+prod-blue-PCI, apollo-prod-blue-PCI,bash,iptables,ntp,openssh-server,python,util-linux,vim
+prod-green-PCI, apollo-prod-green-PCI,bash,iptables,ntp,openssh-server,python,util-linux,vim
+
+
+Software versions:
+dev-test-v0-75
+dev-test-HIPAA-v0-75
+dev-test-PCI-v0-75
+dev-staging-v0-75
+dev-staging-blue-HIPAA-v0-75
+dev-staging-green-HIPAA-v0-75
+dev-staging-blue-PCI-v0-75
+dev-staging-green-PCI-v0-75
+prod-blue-v0-75
+prod-green-v0-75
+prod-blue-HIPAA-v0-75
+prod-green-HIPAA-v0-75
+prod-blue-PCI-v0-75
+prod-green-PCI-v0-75
+dev-test-v1-05
+dev-test-HIPAA-v1-05
+dev-test-PCI-v1-05
+dev-staging-v1-05
+dev-staging-blue-HIPAA-v1-05
+dev-staging-green-HIPAA-v1-05
+dev-staging-blue-PCI-v1-05
+dev-staging-green-PCI-v1-05
+prod-blue-v1-05
+prod-green-v1-05
+prod-blue-HIPAA-v1-05
+prod-green-HIPAA-v1-05
+prod-blue-PCI-v1-05
+prod-green-PCI-v1-05
+
+
+Instances:
+m4.2xl, 8 vCPU, 32 GB of RAM
+m4.4xl, 16 vCPU, 64 GB of RAM
+m4.10xl, 40 vCPU, 160 GB of RAM
+m4.16xl, 64 vCPU, 256 GB of RAM
+c4.2xl, 8 vCPU, 15 GB of RAM
+c4.4xl, 16 vCPU, 30 GB of RAM
+c4.8xl, 32 vCPU, 60 GB of RAM
+x1.16xl, 64 vCPU, 976 GB of RAM
+x1.32xl, 128 vCPU, 1952 GB of RAM
+r3.4xl, 16 vCPU, 122 GB of RAM
+r3.8xl, 32 vCPU, 244 GB of RAM
+i2.4xl, 16 vCPU, 122 GB of RAM
+i2.8xl, 32 vCPU, 244 GB of RAM
+d2.4xl, 16 vCPU, 122 GB of RAM
+d2.8xl, 36 vCPU, 244 GB of RAM
+
+SSH keys:
+dev-test
+dev-staging
+prod
+prod-HIPAA
+prod-PCI
+
+AMIs:
+ami-ef748382 - dev-test-blue
+ami-a4f48acc - dev-test-green
+ami-d06ef2c7 - dev-staging-blue
+ami-d68204be - dev-staging-green
+ami-f0f97c98 - dev-test-HIPAA-blue
+ami-ca38bea2 - dev-test-HIPAA-green
+ami-9c1da3f4 - dev-staging-HIPAA-blue
+ami-9c1da3f4 - dev-staging-HIPAA-green
+ami-34f3d65c - dev-test-PCI-blue
+ami-e4d28a8c - dev-test-PCI-green
+ami-5648f23e - dev-staging-PCI-blue
+ami-eeaf3ff9 - dev-staging-PCI-green
+ami-4e8af226 - prod-blue
+ami-3149455b - prod-green
+ami-bf5e35d6 - prod-HIPAA-blue
+ami-a51376b2 - prod-HIPAA-green
+ami-e4dcfbf3 - prod-PCI-blue
+ami-67def970 - prod-PCI-green
