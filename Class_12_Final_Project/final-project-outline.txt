@@ -106,27 +106,27 @@ Build tool requirements:
       - For example, if fuel-city-tacos_v2.template exists in the same directory
         as the script and the user goes to save the template, it should create
         it as "fuel-city-tacos_v3.template" and set the template version to "3"
-5e. The AWS region the instances will be built in
+5f. The AWS region the instances will be built in
     - (list of regions should be hardcoded in, new regions only happen once or
       twice a year)
-5f. The AMI (Amazon Machine Image) needed for the build.
+5g. The AMI (Amazon Machine Image) needed for the build.
     - (pre-populated with the standard AMI but allow the user to choose from a
       list in an external file)
-5g. The SSH key pair to use when building the instances.
+5h. The SSH key pair to use when building the instances.
      - (pre-populated with the standard SSH key but allow the user to choose
        from a list in an external file - for example, the clusters built for
        dev work should use a different key than the production clusters)
-5h. The software version
+5i. The software version
     - (pre-populated with the default prod blue version, optional choices pulled
       from a short list stored in an external file)
-5i. The software packages required for the software version
+5j. The software packages required for the software version
     - This should be linked to the software version and not allow a user to set
       the wrong software packages for the software version in question.
-5j. Whether or not termination protection will be enabled on the instances
+5k. Whether or not termination protection will be enabled on the instances
     - (this is a true / false value)
-5k. How large the root EBS storage volume should be
+5l. How large the root EBS storage volume should be
     - (user should be able to specify any size between 100 GB and 16,000 GB)
-5l. What instance type is being used for all members of the cluster.
+5m. What instance type is being used for all members of the cluster.
     - (to simplify, we will say that all instances in the cluster do the same
       thing more or less and accordingly, all instances will be the same type)
     - This will pull the list of possible values from an external file
